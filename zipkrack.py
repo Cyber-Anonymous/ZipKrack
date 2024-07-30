@@ -1,6 +1,9 @@
 #!/use/bin/evn python3
-# https://github.com/Cyber-Anonymous
-# Author - Sajjad
+"""
+Tool Name: ZipKrack
+Author: Sajjad
+GitHub: https://github.com/Cyber-Anonymous
+"""
 
 from zipfile import ZipFile
 import sys
@@ -9,7 +12,7 @@ import os
 argv=False
 try:
 	if (sys.argv[1]=="-version" or sys.argv[1]=="--version"):
-		print("ZipKrack - version 1.0")
+		print("ZipKrack - version 1.1")
 		argv=True
 	else:
 		pass
@@ -52,68 +55,72 @@ print("""\033[1;96m
    / /| | '_ \| ' /| '__/ _` |/ __| |/ /
   / /_| | |_) | . \| | | (_| | (__|   <
  /____|_| .__/|_|\_\_|  \__,_|\___|_|\_\\
-        |_|              Cyber Anonymous
+        |_|              Coded by Sajjad
 
 
 \033[0;0m""")
 
 while(True):
-	try:
-		exit=False
-		action=input("\nZip file > ")
-		if(action=="quit"):
-			exit=True
-			break
-		elif(action=="help"):
-			print_help()
-		else:
-			pass
-		try:
-			zip=ZipFile(action,"r")
-			break
-		except:
-			if(action=="" or action=="help"):
-				pass
-			else:
-				print("\n\033[0;91m[!] Unable to locate the zip file!\033[0;0m")
-	except:
+	exit=False
+	action=input("Zip file > ")
+	if(action=="quit" or action=="exit"):
+		exit=True
+		sys.exit()
+	elif(action=="help"):
+		print_help()
+	else:
 		pass
-
-
-if (exit==True):
-	sys.exit()
-else:
-	pass
-
-list=input("\nPassword list > ")
-
-try:
-	word=open(list,"rb")
-	count=open(list,"r")
-except:
-	print("\n\033[0;91m[!] Unable to locate the password list!\033[0;0m")
-	sys.exit()
-
-print("\n")
-line=count.readline()
-condition=0
-while(line):
-	password=word.readline()
 	try:
-		zip.extractall(path="Extract",pwd=password.strip())
-		print("\n[Password Found!] :: {}".format(password.decode()))
+		zip = ZipFile(action,"r")
+		break
+
+	except:
+		if(action==""):
+			pass
+		else:
+			print("\n\033[0;91m[ERROR] Unable to locate the zip file.\033[0;0m\n")
+
+
+while(True):
+	list=input("Password list > ")
+	if(list=="quit" or list=="exit"):
+		sys.exit()
+	elif(list=="help"):
+		print_help()
+	try:
+		wordlist = open(list,"r")
+		break
+	except:
+		if(list == ""):
+			pass
+		else:
+			print("\n\033[0;91m[ERROR] Unable to locate the password list.\033[0;0m\n")
+	
+
+	
+print("\n")
+
+condition=0
+attempts = 0
+for password in wordlist:
+	password = password.strip()
+	sys.stdout.write("\r\033[K")
+	sys.stdout.write("\r{}".format(password))
+	sys.stdout.flush()
+	try:
+		zip.extractall(path="Extract",pwd=password.encode("utf-8"))
+		print("\n\n\033[1;92mFound password: {}".format(password))
 		condition+=1
 		break
 	except:
-		print(password.decode())
-	line=count.readline()
+		pass
+	attempts +=1
 	
 if(condition==0):
-	print("\n[Password not found!]")
+	print("\nNo valid password found.")
+	print("Attempted a total of {} passwords.".format(attempts))
 else:
 	pass
 
 zip.close()
-word.close()
-count.close()
-
+wordlist.close()
